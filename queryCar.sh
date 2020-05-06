@@ -5,7 +5,6 @@ set -ev
 CHAINCODE_NAME="mycc1"
 CHAINCODE_SRC="github.com/chaincode"
 CHANNEL_NAME="mychannel"
-ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 
 docker exec cli peer chaincode query -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["queryCar", "CAR1"]}'
     
