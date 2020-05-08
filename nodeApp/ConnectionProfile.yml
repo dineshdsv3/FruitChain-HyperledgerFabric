@@ -33,7 +33,7 @@ organizations:
     certificateAuthorities:
       - ca.org1.example.com
     adminPrivateKey:
-      path: ../crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/abe00614def3d03660918f7fdef9f1945603b31b140d8e9ccee34d1dade89b83_sk
+      path: ../crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/f967992767f49868565d58544de7c8d7b39780eafc381f48296d1dac27ad7597_sk
     signedCert:
       path: ../crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem
 
