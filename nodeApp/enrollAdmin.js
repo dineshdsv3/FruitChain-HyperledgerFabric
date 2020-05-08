@@ -1,0 +1,68 @@
+'use strict';
+var fs = require('fs');
+var path = require('path');
+
+var configFilePath = path.join(__dirname, './ConnectionProfile.yml');
+const CONFIG = fs.readFileSync(configFilePath, 'utf8')
+
+/*
+* Copyright IBM Corp All Rights Reserved
+*
+* SPDX-License-Identifier: Apache-2.0
+*/
+/*
+ * Enroll the admin user
+ */
+
+var FabricClient = require('fabric-client');
+var FabricCAClient = require('fabric-ca-client');
+
+
+var path = require('path');
+var util = require('util');
+var os = require('os');
+
+
+var fabricClient = new FabricClient();
+fabricClient.loadFromConfig(configFilePath);
+
+
+var connection = fabricClient;
+var fabricCAClient;
+var adminUser;
+
+connection.initCredentialStores().then(() => {
+  fabricCAClient = connection.getCertificateAuthority();
+  return connection.getUserContext('admin', true);
+}).then((user) => {
+  if (user) {
+    throw new Error("Admin already exists");
+  } else {
+    return fabricCAClient.enroll({
+      enrollmentID: 'admin',
+      enrollmentSecret: 'adminpw',
+      attr_reqs: [
+        { name: "hf.Revoker" },
+        { name: "hf.Registrar.Roles" },
+        { name: "hf.Registrar.Attributes" }
+      ]
+    }).then((enrollment) => {
+      console.log('Successfully enrolled admin user "admin"');
+      return connection.createUser(
+          {username: 'admin',
+              mspid: 'Org1MSP',
+              cryptoContent: { privateKeyPEM: enrollment.key.toBytes(), signedCertPEM: enrollment.certificate }
+          });
+    }).then((user) => {
+      adminUser = user;
+      return connection.setUserContext(adminUser);
+    }).catch((err) => {
+      console.error('Failed to enroll and persist admin. Error: ' + err.stack ? err.stack : err);
+      throw new Error('Failed to enroll admin');
+    });
+  }
+}).then(() => {
+    console.log('Assigned the admin user to the fabric client ::' + adminUser.toString());
+}).catch((err) => {
+    console.error('Failed to enroll admin: ' + err);
+});
