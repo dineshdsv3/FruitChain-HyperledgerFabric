@@ -1,16 +1,16 @@
 {
-    "name": "fruit-supply-chain",
-    "version": "1.0.0",
-    "description": "Hyperledger Fabric Frui Supply Chain POC",
-    "main": "server.js",
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "dependencies": {
-      "express": "^4.17.1",
-      "fabric-ca-client": "~1.1.0",
-      "fabric-client": "~1.1.0",
-      "grpc": "^1.6.0"
-    },
-    "author": "Dinesh"
-  }
+  "name": "fruit-supply-chain",
+  "version": "1.0.0",
+  "description": "Hyperledger Fabric Fruit Supply Chain POC",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "fabric-ca-client": "~1.1.0",
+    "fabric-client": "^1.4.8",
+    "grpc": "^1.6.0"
+  },
+  "author": "Dinesh"
+}
