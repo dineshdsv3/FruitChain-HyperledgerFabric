@@ -2,100 +2,49 @@
 
 const { FileSystemWallet, Gateway } = require('fabric-network');
 const path = require('path');
-var util = require('util');
 
-const ccpPath = path.join(__dirname, './ConnectionProfile.yml');
+const ccpPath = path.join(__dirname, './ConnectionProfile.json');
 
-var FabricClient = require('fabric-client');
+async function main() {
+    try {
 
-var fabricClient = new FabricClient();
-fabricClient.loadFromConfig(ccpPath);
+        // Create a new file system based wallet for managing identities.
+        const walletPath = path.join(process.cwd(), 'wallet');
+        const wallet = new FileSystemWallet(walletPath);
+        // console.log(`Wallet path: ${walletPath}`);
 
-var connection = fabricClient;
+        // Check to see if we've already enrolled the user.
+        const userExists = await wallet.exists('user1');
+        if (!userExists) {
+            console.log('An identity for the user "user1" does not exist in the wallet');
+            console.log('Run the registerUser.js application before retrying');
+            return;
+        }
 
-var tx_id = null;
-var peers = connection.getPeersForOrg();
+        // Create a new gateway for connecting to our peer node.
+        const gateway = new Gateway();
+        await gateway.connect(ccpPath, { wallet, identity: 'user1', discovery: { enabled: true, asLocalhost: true } });
 
-var channel = connection.getChannel();
+        // Get the network (channel) our contract is deployed to.
+        const network = await gateway.getNetwork('mychannel');
 
-connection
-	.initCredentialStores()
-	.then(() => {
-		// fabricCAClient = connection.getCertificateAuthority();
-		return connection.getUserContext('admin', true);
-	})
-	.then((user_from_store) => {
-		if (user_from_store && user_from_store.isEnrolled()) {
-			console.log('Successfully loaded user1 from persistence');
-			// member_user = user_from_store;
-		} else {
-			throw new Error('Failed to get user1.... run registerUser.js');
-		}
+        // Get the contract from the network.
+		const contract = network.getContract('mycc1');
+		// console.log(contract)
+		// console.log(network);
+        // Submit the specified transaction.
+        // createCar transaction - requires 5 argument, ex: ('createCar', 'CAR12', 'Honda', 'Accord', 'Black', 'Tom')
+        // changeCarOwner transaction - requires 2 args , ex: ('changeCarOwner', 'CAR10', 'Dave')
+        await contract.submitTransaction('createCar', 'CAR12', 'Honda', 'Accord', 'Black', 'Tom');
+        // console.log('Transaction has been submitted');
 
-		// get a transaction id object based on the current user assigned to fabric client
-		tx_id = connection.newTransactionID();
-		console.log('Assigning transaction_id: ', tx_id._transaction_id);
+        // // Disconnect from the gateway.
+        await gateway.disconnect();
 
-		// createCar chaincode function - requires 5 args, ex: args: ['CAR12', 'Honda', 'Accord', 'Black', 'Tom'],
-		// changeCarOwner chaincode function - requires 2 args , ex: args: ['CAR10', 'Dave'],
-		// must send the proposal to endorsing peers
-		var request = {
-			//targets: let default to the peer assigned to the client
-			chaincodeId: 'mycc1',
-			fcn: 'createFruit',
-			args: ['Fruit333', 'orange', '100', 'DineshDSV'],
-			chainId: 'mychannel',
-			txId: tx_id,
-		};
+    } catch (error) {
+        console.error(`Failed to submit transaction: ${error}`);
+        process.exit(1);
+    }
+}
 
-		// send the transaction proposal to the peers
-		return channel.sendTransactionProposal(request);
-	})
-	.then(async (results) => {
-		var proposalResponses = results[0];
-		var proposal = results[1];
-		let isProposalGood = false;
-		if (proposalResponses && proposalResponses[0].response && proposalResponses[0].response.status === 200) {
-			isProposalGood = true;
-			console.log('Transaction proposal was good');
-		} else {
-			console.error('Transaction proposal was bad');
-		}
-		if (isProposalGood) {
-			console.log(
-				util.format(
-					'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s"',
-					proposalResponses[0].response.status,
-					proposalResponses[0].response.message
-				)
-			);
-
-			// build up the request for the orderer to have the transaction committed
-			// var request = {
-			// 	proposalResponses: proposalResponses,
-			// 	proposal: proposal,
-			// };
-
-			// set the transaction listener and set a timeout of 30 sec
-			// if the transaction did not get committed within the timeout period,
-			// report a TIMEOUT status
-			var transaction_id_string = tx_id.getTransactionID();
-			//Get the transaction ID string to be used by the event processing
-			// var promises = [];
-
-			// var sendPromise = channel.sendTransaction(request);
-			// promises.push(sendPromise);
-
-			const walletPath = path.join(__dirname, './KeyStore');
-			// console.log(walletPath);
-			const wallet = new FileSystemWallet(walletPath);
-			// console.log(`Wallet path: ${walletPath}`);
-
-            const gateway = new Gateway();
-            await gateway.connect(ccpPath, { wallet, identity: 'user1', discovery: { enabled: true, asLocalhost: true } });
-			const network = await gateway.getNetwork('mychannel');
-
-			// Get the contract from the network.
-			const contract = network.getContract('fabcar');
-		}
-	});
+main();
