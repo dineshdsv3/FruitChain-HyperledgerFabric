@@ -51,7 +51,7 @@ connection
 		// send the transaction proposal to the peers
 		return channel.sendTransactionProposal(request);
 	})
-	.then((results) => {
+	.then(async (results) => {
 		var proposalResponses = results[0];
 		var proposal = results[1];
 		let isProposalGood = false;
@@ -85,5 +85,17 @@ connection
 
 			// var sendPromise = channel.sendTransaction(request);
 			// promises.push(sendPromise);
+
+			const walletPath = path.join(__dirname, './KeyStore');
+			// console.log(walletPath);
+			const wallet = new FileSystemWallet(walletPath);
+			// console.log(`Wallet path: ${walletPath}`);
+
+            const gateway = new Gateway();
+            await gateway.connect(ccpPath, { wallet, identity: 'user1', discovery: { enabled: true, asLocalhost: true } });
+			const network = await gateway.getNetwork('mychannel');
+
+			// Get the contract from the network.
+			const contract = network.getContract('fabcar');
 		}
 	});
