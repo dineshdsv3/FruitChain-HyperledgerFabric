@@ -46,9 +46,9 @@ connection.initCredentialStores().then(() => {
   // must send the proposal to endorsing peers
   var request = {
     //targets: let default to the peer assigned to the client
-    chaincodeId: 'mycc',
+    chaincodeId: 'mycc1',
     fcn: 'createFruit',
-    args: ['Fruit1', 'Banana2', '10', 'DineshDSV'],
+    args: ['Fruit333', 'orange', '100', 'DineshDSV'],
     chainId: 'mychannel',
     txId: tx_id
   };
