@@ -22,9 +22,9 @@ var connection = fabricClient;
 // var adminUser;
 var tx_id = null;
 var peers = connection.getPeersForOrg();
-var event_hub = connection.getEventHub(peers[0].getName());
 
 var channel = connection.getChannel();
+var event_hub = channel.newChannelEventHub(peers);
 
 connection.initCredentialStores().then(() => {
   // fabricCAClient = connection.getCertificateAuthority();

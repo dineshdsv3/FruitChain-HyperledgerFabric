@@ -42,7 +42,7 @@ orderers:
     url: grpcs://localhost:7050
     grpcOptions:
       ssl-target-name-override: orderer.example.com
-      grpc-max-send-message-length: 150
+      grpc-max-send-message-length: -1
     tlsCACerts:
       path: ../crypto-config/ordererOrganizations/example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 
