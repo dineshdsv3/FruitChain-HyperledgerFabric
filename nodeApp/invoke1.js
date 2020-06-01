@@ -112,7 +112,7 @@ connection
 							console.error('The transaction was invalid, code = ' + code);
 							resolve(return_status); // we could use reject(new Error('Problem with the tranaction, event status ::'+code));
 						} else {
-							console.log(event_hub.ChannelEventHub)
+							// console.log(event_hub.ChannelEventHub)
 							console.log('The transaction has been committed on peer ' );
 							resolve(return_status);
 						}
