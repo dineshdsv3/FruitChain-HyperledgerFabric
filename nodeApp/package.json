@@ -11,7 +11,7 @@
     "fabric-ca-client": "^1.4.0",
     "fabric-client": "^1.4.0",
     "fabric-network": "^1.4.0",
-    "grpc": "^1.6.0"
+    "grpc": "^1.24.9"
   },
   "author": "Dinesh"
 }
